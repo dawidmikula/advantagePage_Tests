@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "./_tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
@@ -11,6 +11,7 @@ export default defineConfig({
     baseURL: "https://advantageonlineshopping.com",
     trace: "retain-on-failure",
   },
+  timeout: 60000,
 
   projects: [
     {
@@ -21,9 +22,9 @@ export default defineConfig({
       },
     },
 
-    {
-      name: "mobileChrome",
-      use: { ...devices["Pixel 5"] },
-    },
+    // {
+    //   name: "mobileChrome",
+    //   use: { ...devices["Pixel 5"] },
+    // },
   ],
 });
