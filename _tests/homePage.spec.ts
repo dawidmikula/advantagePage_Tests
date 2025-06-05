@@ -1,12 +1,53 @@
 import { test, expect } from "@playwright/test";
-import { HomePage } from "../_pages/home.page";
+import { HomePage_ContactUs, HomePage_PopularItems } from "../_pages/home.page";
 import { categoriesWithProducts } from "../_testData/categoriesToContactUs";
+import {
+  popularItems,
+  popularItemsAfterClick,
+} from "../_testData/popularItems";
 
-test.describe("Home Page", () => {
-  let homePage: HomePage;
+test.describe("Home Page - Popular Items", () => {
+  let homePage: HomePage_PopularItems;
 
   test.beforeEach(async ({ page }) => {
-    homePage = new HomePage(page);
+    homePage = new HomePage_PopularItems(page);
+    await page.goto("/", { waitUntil: "networkidle" });
+  });
+
+  test("Popular Items - Products check", async ({ page }) => {
+    await expect(homePage.poularItemsTittle).toHaveText("POPULAR ITEMS");
+
+    const items = homePage.getPopularItems();
+
+    for (const [i, item] of items.entries()) {
+      await expect(item.image).toBeVisible();
+      await expect(item.name).toBeVisible();
+      await expect(item.name).not.toHaveText("");
+      await expect(item.link).toBeVisible();
+      await expect(item.link).toHaveText("View Details");
+
+      const productName = await item.name.innerText();
+      expect(productName.trim()).toBe(popularItems[i]);
+    }
+  });
+
+  test("Popular Items - Products open", async ({ page }) => {
+    const items = homePage.getPopularItems();
+
+    for (const [i, item] of items.entries()) {
+      await item.link.click();
+      await expect(homePage.productName).toHaveText(popularItemsAfterClick[i]);
+      await page.goBack();
+      await expect(homePage.poularItemsTittle).toBeVisible();
+    }
+  });
+});
+
+test.describe("Home Page - Contact Us", () => {
+  let homePage: HomePage_ContactUs;
+
+  test.beforeEach(async ({ page }) => {
+    homePage = new HomePage_ContactUs(page);
     await page.goto("/", { waitUntil: "networkidle" });
   });
 
