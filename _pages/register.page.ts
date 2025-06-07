@@ -24,7 +24,7 @@ export class RegisterPage_AccountDetails {
     this.createAccountHeader = this.page.getByRole("heading", {
       name: "CREATE ACCOUNT",
     });
-    const accountDetailsLocator = page.getByText("ACCOUNT DETAILS *");
+    const accountDetailsLocator = this.page.getByText("ACCOUNT DETAILS *");
     this.accountDetailsHeader = accountDetailsLocator.getByRole("heading", {
       name: "ACCOUNT DETAILS",
     });
@@ -36,13 +36,13 @@ export class RegisterPage_AccountDetails {
 
     this.password = accountDetailsLocator.locator('[a-hint="Password"] label');
     this.passError = accountDetailsLocator.locator('[a-hint="Password"]').getByText("Password field is required");
-    this.passReq = accountDetailsLocator.locator('[a-hint="Password"] ul li a');
+    // this.passReq = accountDetailsLocator.locator('[a-hint="Password"] ul li a');
 
     this.confirmPassword = accountDetailsLocator.locator('[a-hint="Confirm password"] label');
     this.confirmPassError = accountDetailsLocator
       .locator('[a-hint="Confirm password"]')
       .getByText("Confirm password field is");
-    this.confirmPassReq = accountDetailsLocator.locator('[sec-name="userPassword"] [a-hint="Confirm password"] ul');
+    // this.confirmPassReq = accountDetailsLocator.locator('[sec-name="userPassword"] [a-hint="Confirm password"] ul');
   }
 
   /**
@@ -93,8 +93,16 @@ export class RegisterPage_AccountDetails {
 
 //    PERSONAL DETAILS    //
 export class RegisterPage_PersonalDetails {
+  personalDetailsHeader: Locator;
+  firstName: Locator;
+  lastName: Locator;
+  phoneNumber: Locator;
+
   constructor(private page: Page) {
-    //
+    this.personalDetailsHeader = this.page.getByRole("heading", { name: "PERSONAL DETAILS" });
+    this.firstName = this.page.locator('[sec-name="userFirstName"] label');
+    this.lastName = this.page.locator('[sec-name="userLastName"] label');
+    this.phoneNumber = this.page.locator('[sec-name="userPhone"] label');
   }
 
   firstNameInput: Locator;
@@ -119,8 +127,20 @@ export class RegisterPage_PersonalDetails {
 
 //    ADDRESS    //
 export class RegisterPage_Address {
+  addressHeader: Locator;
+  country: Locator;
+  city: Locator;
+  address: Locator;
+  state: Locator;
+  postalCode: Locator;
+
   constructor(private page: Page) {
-    //
+    this.addressHeader = this.page.getByRole("heading", { name: "ADDRESS" });
+    this.country = this.page.locator('[sec-name="userCountry"] label');
+    this.city = this.page.locator('[sec-name="userCity"] label');
+    this.address = this.page.locator('[sec-name="userAdress"] label');
+    this.state = this.page.locator('[sec-name="userState"] label');
+    this.postalCode = this.page.locator('[sec-name="userPostalCode"] label');
   }
 
   countrySelect: Locator;
@@ -159,10 +179,14 @@ export class RegisterPage_Address {
 
 //    BOTTOM    //
 export class RegisterPage_BottomContent {
+  mailingConsent: Locator;
+  agreeConditions: Locator;
   userAlreadyExistError: Locator;
   alreadyHaveAccount: Locator;
 
   constructor(private page: Page) {
+    this.mailingConsent = this.page.locator("div span").filter({ hasText: "Receive" });
+    this.agreeConditions = this.page.locator("label").filter({ hasText: "I agree to the www." });
     this.userAlreadyExistError = this.page.getByText("User name already exists");
     this.alreadyHaveAccount = this.page.getByRole("link", { name: "ALREADY HAVE AN ACCOUNT?" });
   }

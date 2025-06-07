@@ -23,7 +23,6 @@ test.describe("Register", () => {
   });
 
   test("Register - Account Details Text Checking", async ({ page }) => {
-    //
     await expect(registerPageAccountDetails.createAccountHeader).toHaveText(
       "CREATE ACCOUNT"
     );
@@ -61,6 +60,42 @@ test.describe("Register", () => {
     );
   });
 
+  test("Register - Personal Details Text Checking", async ({ page }) => {
+    await expect(registerPagePersonalDetails.personalDetailsHeader).toHaveText(
+      "PERSONAL DETAILS"
+    );
+    await expect(registerPagePersonalDetails.firstName).toHaveText(
+      "First Name"
+    );
+    await expect(registerPagePersonalDetails.lastName).toHaveText("Last Name");
+    await expect(registerPagePersonalDetails.phoneNumber).toHaveText(
+      "Phone Number"
+    );
+  });
+
+  test("Register - Address Text Checking ", async ({ page }) => {
+    await expect(registerPageAddress.addressHeader).toHaveText("ADDRESS");
+    await expect(registerPageAddress.country).toHaveText("Country");
+    await expect(registerPageAddress.city).toHaveText("City");
+    await expect(registerPageAddress.address).toHaveText("Address");
+    await expect(registerPageAddress.state).toHaveText(
+      "State / Province / Region"
+    );
+    await expect(registerPageAddress.postalCode).toHaveText("Postal Code");
+  });
+
+  test("Register - Bottom Text Checking ", async ({ page }) => {
+    await expect(registerPageBottomContent.mailingConsent).toHaveText(
+      "Receive exclusive offers and promotions from Advantage"
+    );
+    await expect(registerPageBottomContent.agreeConditions).toHaveText(
+      "I agree to the www.AdvantageOnlineShopping.com Conditions of Use and Privacy Notice"
+    );
+    await expect(registerPageBottomContent.alreadyHaveAccount).toHaveText(
+      "ALREADY HAVE AN ACCOUNT?"
+    );
+  });
+
   test("Register - Account Details Provide Correct Data", async ({ page }) => {
     const password =
       faker.string.alpha({ casing: "upper" }) +
@@ -73,7 +108,7 @@ test.describe("Register", () => {
       password,
       password
     );
-    //await registerPageBottomContent.agreeConditionsAndRegister(true, true);
+    await registerPageBottomContent.agreeConditionsAndRegister(true, true);
   });
 
   test("Register - Provide All Correct Informations", async ({ page }) => {
@@ -89,16 +124,16 @@ test.describe("Register", () => {
       password
     );
     await registerPagePersonalDetails.providePersonalDetailsInRegisterForm(
-      faker.person.firstName(),
-      faker.person.lastName(),
+      faker.person.firstName().slice(2, 30),
+      faker.person.lastName().slice(2, 30),
       faker.string.numeric(9)
     );
     await registerPageAddress.provideAddressInRegisterForm(
       "Poland",
-      faker.location.city(),
-      faker.location.streetAddress(),
-      faker.location.state(),
-      faker.location.zipCode()
+      faker.location.city().slice(1, 25),
+      faker.location.streetAddress().slice(1, 50),
+      faker.location.state().slice(1, 10),
+      faker.location.zipCode().slice(1, 10)
     );
     await registerPageBottomContent.agreeConditionsAndRegister(true, true);
   });
