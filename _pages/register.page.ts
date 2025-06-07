@@ -1,7 +1,12 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 //    ACCOUNT DETAILS    //
 export class RegisterPage_AccountDetails {
   createAccountHeader: Locator;
+
+  usernameInput: Locator;
+  emailInput: Locator;
+  passInput: Locator;
+  confirmPassInput: Locator;
 
   accountDetailsHeader: Locator;
   username: Locator;
@@ -29,20 +34,23 @@ export class RegisterPage_AccountDetails {
     this.email = accountDetailsLocator.locator('[sec-name="userEmail"] label');
     this.emailError = accountDetailsLocator.getByText("Email field is required");
 
-    this.password = accountDetailsLocator.locator('[sec-name="userPassword"] [a-hint="Password"] label');
-    this.passError = accountDetailsLocator.getByText("Password field is required");
-    this.passReq = accountDetailsLocator.locator('[sec-name="userPassword"] [a-hint="Password"] ul');
+    this.password = accountDetailsLocator.locator('[a-hint="Password"] label');
+    this.passError = accountDetailsLocator.locator('[a-hint="Password"]').getByText("Password field is required");
+    this.passReq = accountDetailsLocator.locator('[a-hint="Password"] ul li a');
 
-    this.confirmPassword = accountDetailsLocator.locator('[sec-name="userPassword"] [a-hint="Confirm password"] label');
-    this.confirmPassError = accountDetailsLocator.getByText("Confirm password field is");
+    this.confirmPassword = accountDetailsLocator.locator('[a-hint="Confirm password"] label');
+    this.confirmPassError = accountDetailsLocator
+      .locator('[a-hint="Confirm password"]')
+      .getByText("Confirm password field is");
     this.confirmPassReq = accountDetailsLocator.locator('[sec-name="userPassword"] [a-hint="Confirm password"] ul');
   }
 
-  usernameInput: Locator;
-  emailInput: Locator;
-  passInput: Locator;
-  confirmPassInput: Locator;
-
+  /**
+   * @param {string} username - Username to be entered into the registration form.
+   * @param {string} email - Email address to be entered.
+   * @param {string} password - Password to be entered.
+   * @param {string} confirmPassword - Confirmation password to be entered.
+   */
   async provideAccountDetailsInRegisterForm(
     username: string,
     email: string,
@@ -59,7 +67,30 @@ export class RegisterPage_AccountDetails {
     await this.passInput.fill(password);
     await this.confirmPassInput.fill(confirmPassword);
   }
+
+  /**
+   * @param {Page} page
+   * @param {Locator} fieldNameLocator - Locator for the input's header
+   * @param {string} fieldExpectedName - Expected text for the header
+   * @param {Locator} errorLocator - Locator for the error message element
+   * @param {string} errorInfo - Expected text of the error message.
+   */
+  async checkInputHeaderAndErrorInfo(
+    page: Page,
+    fieldNameLocator: Locator,
+    fieldExpectedName: string,
+    errorLocator: Locator,
+    errorInfo: string
+  ) {
+    await expect(fieldNameLocator).toHaveText(fieldExpectedName);
+    await expect(fieldNameLocator).toBeVisible();
+    await fieldNameLocator.click();
+    await expect(fieldNameLocator).toBeVisible();
+    await page.locator("body").click();
+    await expect(errorLocator).toHaveText(errorInfo);
+  }
 }
+
 //    PERSONAL DETAILS    //
 export class RegisterPage_PersonalDetails {
   constructor(private page: Page) {
@@ -70,6 +101,11 @@ export class RegisterPage_PersonalDetails {
   lastNameInput: Locator;
   phoneNumberInput: Locator;
 
+  /**
+   * @param {string} firstName - The user's first name.
+   * @param {string} lastName - The user's last name.
+   * @param {string} phoneNumber - The user's phone number.
+   */
   async providePersonalDetailsInRegisterForm(firstName: string, lastName: string, phoneNumber: string) {
     this.firstNameInput = this.page.locator('input[name="first_nameRegisterPage"]');
     this.lastNameInput = this.page.locator('input[name="last_nameRegisterPage"]');
@@ -93,6 +129,13 @@ export class RegisterPage_Address {
   stateInput: Locator;
   postalCodeInput: Locator;
 
+  /**
+   * @param {string} country - The country to select from the dropdown.
+   * @param {string} city - The city name to input.
+   * @param {string} address - The street address to input.
+   * @param {string} state - The state, province, or region to input.
+   * @param {string} postalCode - The postal/ZIP code to input.
+   */
   async provideAddressInRegisterForm(
     country: string,
     city: string,
@@ -127,6 +170,10 @@ export class RegisterPage_BottomContent {
   agreeConditionsCheckbox: Locator;
   registerButton: Locator;
 
+  /**
+   * @param {boolean} mailingConsentCheckbox - Whether to check (true) or uncheck (false) the "allow offers/promotion" checkbox.
+   * @param {boolean} agreeConditionsCheckbox - Whether to check (true) or uncheck (false) the "I agree...Conditions" checkbox.
+   */
   async agreeConditionsAndRegister(mailingConsentCheckbox: boolean, agreeConditionsCheckbox: boolean) {
     this.mailingConsentCheckbox = this.page.locator('input[name="allowOffersPromotion"]');
     this.agreeConditionsCheckbox = this.page.locator('input[name="i_agree"]');

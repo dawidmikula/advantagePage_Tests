@@ -1,12 +1,11 @@
-import test from "@playwright/test";
-import { faker, Faker } from "@faker-js/faker";
+import test, { expect } from "@playwright/test";
+import { faker } from "@faker-js/faker";
 import {
   RegisterPage_AccountDetails,
   RegisterPage_Address,
   RegisterPage_BottomContent,
   RegisterPage_PersonalDetails,
 } from "../_pages/register.page";
-import { format } from "path";
 
 test.describe("Register", () => {
   let registerPageAccountDetails: RegisterPage_AccountDetails;
@@ -23,7 +22,46 @@ test.describe("Register", () => {
     await page.goto("/#/register", { waitUntil: "networkidle" });
   });
 
-  test("Register - Correct Account Details", async ({ page }) => {
+  test("Register - Account Details Text Checking", async ({ page }) => {
+    //
+    await expect(registerPageAccountDetails.createAccountHeader).toHaveText(
+      "CREATE ACCOUNT"
+    );
+    await expect(registerPageAccountDetails.accountDetailsHeader).toHaveText(
+      "ACCOUNT DETAILS"
+    );
+
+    await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
+      page,
+      registerPageAccountDetails.username,
+      "Username",
+      registerPageAccountDetails.usernameError,
+      "Username field is required"
+    );
+    await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
+      page,
+      registerPageAccountDetails.email,
+      "Email",
+      registerPageAccountDetails.emailError,
+      "Email field is required"
+    );
+    await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
+      page,
+      registerPageAccountDetails.password,
+      "Password",
+      registerPageAccountDetails.passError,
+      "Password field is required"
+    );
+    await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
+      page,
+      registerPageAccountDetails.confirmPassword,
+      "Confirm password",
+      registerPageAccountDetails.confirmPassError,
+      "Confirm password field is required"
+    );
+  });
+
+  test("Register - Account Details Provide Correct Data", async ({ page }) => {
     const password =
       faker.string.alpha({ casing: "upper" }) +
       faker.string.alpha({ casing: "lower" }) +
@@ -35,10 +73,10 @@ test.describe("Register", () => {
       password,
       password
     );
-    await registerPageBottomContent.agreeConditionsAndRegister(true, true);
+    //await registerPageBottomContent.agreeConditionsAndRegister(true, true);
   });
 
-  test("Register - Provide All Informations", async ({ page }) => {
+  test("Register - Provide All Correct Informations", async ({ page }) => {
     const password =
       faker.string.alpha({ casing: "upper" }) +
       faker.string.alpha({ casing: "lower" }) +
