@@ -42,12 +42,9 @@ type PopularItemLocators = {
 
 export class HomePage_PopularItems {
   poularItemsTittle: Locator;
-  productName: Locator;
 
   constructor(private page: Page) {
     this.poularItemsTittle = this.page.locator("#popular_items h3");
-    // Product page - possible move do product.page.ts
-    this.productName = this.page.locator("#Description h1");
   }
 
   getPopularItems(): PopularItemLocators[] {
@@ -61,5 +58,24 @@ export class HomePage_PopularItems {
         link: item.locator("a"),
       };
     });
+  }
+}
+
+export class HomePage_SpecialOffer {
+  specialOfferHeader: Locator;
+  specialOfferImg: Locator;
+  specialOfferProductHeader: Locator;
+  specialOfferProductName: Locator;
+  specialOfferProductDesc: Locator;
+  specialOfferSeeOfferButton: Locator;
+
+  constructor(private page: Page) {
+    const specialOfferArticle = this.page.locator("#special_offer_items");
+    this.specialOfferHeader = specialOfferArticle.locator("h3");
+    this.specialOfferImg = specialOfferArticle.getByRole("img", { name: "Special-offer" });
+    this.specialOfferProductHeader = specialOfferArticle.locator("span");
+    this.specialOfferProductName = specialOfferArticle.locator("h1");
+    this.specialOfferProductDesc = specialOfferArticle.locator("p");
+    this.specialOfferSeeOfferButton = specialOfferArticle.locator("a button");
   }
 }

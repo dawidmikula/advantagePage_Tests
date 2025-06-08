@@ -1,10 +1,15 @@
 import { test, expect } from "@playwright/test";
-import { HomePage_ContactUs, HomePage_PopularItems } from "../_pages/home.page";
+import {
+  HomePage_ContactUs,
+  HomePage_PopularItems,
+  HomePage_SpecialOffer,
+} from "../_pages/home.page";
 import { categoriesWithProducts } from "../_testData/categoriesToContactUs";
 import {
   popularItems,
   popularItemsAfterClick,
 } from "../_testData/popularItems";
+import { ProductPage } from "../_pages/product.page";
 
 test.describe("Home Page - Popular Items", () => {
   let homePage: HomePage_PopularItems;
@@ -14,7 +19,7 @@ test.describe("Home Page - Popular Items", () => {
     await page.goto("/", { waitUntil: "networkidle" });
   });
 
-  test("Popular Items - Products check", async ({ page }) => {
+  test("Popular Items - Popular Items Checking", async ({ page }) => {
     await expect(homePage.poularItemsTittle).toHaveText("POPULAR ITEMS");
 
     const items = homePage.getPopularItems();
@@ -32,11 +37,16 @@ test.describe("Home Page - Popular Items", () => {
   });
 
   test("Popular Items - Products open", async ({ page }) => {
+    let productPage: ProductPage;
+    productPage = new ProductPage(page);
+
     const items = homePage.getPopularItems();
 
     for (const [i, item] of items.entries()) {
       await item.link.click();
-      await expect(homePage.productName).toHaveText(popularItemsAfterClick[i]);
+      await expect(productPage.productName).toHaveText(
+        popularItemsAfterClick[i]
+      );
       await page.goBack();
       await expect(homePage.poularItemsTittle).toBeVisible();
     }
@@ -136,5 +146,38 @@ test.describe("Home Page - Contact Us", () => {
         expect(actualOptions).toContain(expectedProduct);
       }
     }
+  });
+});
+
+test.describe("Home Page - Special Offer", () => {
+  let homePage: HomePage_SpecialOffer;
+
+  test.beforeEach(async ({ page }) => {
+    homePage = new HomePage_SpecialOffer(page);
+    await page.goto("/", { waitUntil: "networkidle" });
+  });
+
+  test("Special Offer - Checking", async ({ page }) => {
+    let productPage: ProductPage;
+    productPage = new ProductPage(page);
+
+    await expect(homePage.specialOfferHeader).toHaveText("SPECIAL OFFER");
+    await expect(homePage.specialOfferProductHeader).toHaveText(
+      "EXPLORE THE NEW DESIGN"
+    );
+    const specialOfferProductName =
+      await homePage.specialOfferProductName.innerText();
+    expect(specialOfferProductName).toBe("HP Pavilion 15z Touch Laptop");
+    await expect(homePage.specialOfferProductDesc).toHaveText(
+      "Supremely thin, yet incredibly durable"
+    );
+    await expect(homePage.specialOfferSeeOfferButton).toHaveText("SEE OFFER");
+    await page.waitForTimeout(1000);
+    await expect(homePage.specialOfferImg).toBeVisible();
+
+    await homePage.specialOfferSeeOfferButton.click();
+    await expect(productPage.productName).toHaveText(
+      new RegExp(specialOfferProductName, "i")
+    );
   });
 });
