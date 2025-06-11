@@ -9,16 +9,13 @@ export class RegisterPage_AccountDetails {
   confirmPassInput: Locator;
 
   accountDetailsHeader: Locator;
-  username: Locator;
-  usernameError: Locator;
-  email: Locator;
-  emailError: Locator;
-  password: Locator;
-  passError: Locator;
-  passReq: Locator;
-  confirmPassword: Locator;
-  confirmPassError: Locator;
-  confirmPassReq: Locator;
+
+  usernameLabel: Locator;
+  emailLabel: Locator;
+  passwordLabel: Locator;
+  // passReq: Locator;
+  confirmPasswordLabel: Locator;
+  // confirmPassReq: Locator;
 
   constructor(private page: Page) {
     this.createAccountHeader = this.page.getByRole("heading", {
@@ -28,20 +25,14 @@ export class RegisterPage_AccountDetails {
     this.accountDetailsHeader = accountDetailsLocator.getByRole("heading", {
       name: "ACCOUNT DETAILS",
     });
-    this.username = accountDetailsLocator.locator('[sec-name="userName"] label');
-    this.usernameError = accountDetailsLocator.getByText("Username field is required");
+    this.usernameLabel = accountDetailsLocator.locator('[sec-name="userName"] label');
 
-    this.email = accountDetailsLocator.locator('[sec-name="userEmail"] label');
-    this.emailError = accountDetailsLocator.getByText("Email field is required");
+    this.emailLabel = accountDetailsLocator.locator('[sec-name="userEmail"] label');
 
-    this.password = accountDetailsLocator.locator('[a-hint="Password"] label');
-    this.passError = accountDetailsLocator.locator('[a-hint="Password"]').getByText("Password field is required");
+    this.passwordLabel = accountDetailsLocator.locator('[a-hint="Password"] label');
     // this.passReq = accountDetailsLocator.locator('[a-hint="Password"] ul li a');
 
-    this.confirmPassword = accountDetailsLocator.locator('[a-hint="Confirm password"] label');
-    this.confirmPassError = accountDetailsLocator
-      .locator('[a-hint="Confirm password"]')
-      .getByText("Confirm password field is");
+    this.confirmPasswordLabel = accountDetailsLocator.locator('[a-hint="Confirm password"] label');
     // this.confirmPassReq = accountDetailsLocator.locator('[sec-name="userPassword"] [a-hint="Confirm password"] ul');
   }
 
@@ -69,7 +60,6 @@ export class RegisterPage_AccountDetails {
   }
 
   /**
-   * @param {Page} page
    * @param {Locator} fieldNameLocator - Locator for the input's header
    * @param {string} fieldExpectedName - Expected text for the header
    * @param {Locator} errorLocator - Locator for the error message element

@@ -6,6 +6,10 @@ import {
   RegisterPage_BottomContent,
   RegisterPage_PersonalDetails,
 } from "../_pages/register.page";
+import {
+  checkValidation,
+  generateValidPassword,
+} from "../_utils/registerAccountDetailsHelpers";
 
 test.describe("Register", () => {
   let registerPageAccountDetails: RegisterPage_AccountDetails;
@@ -32,30 +36,30 @@ test.describe("Register", () => {
 
     await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
       page,
-      registerPageAccountDetails.username,
+      registerPageAccountDetails.usernameLabel,
       "Username",
-      registerPageAccountDetails.usernameError,
+      registerPageAccountDetails.usernameLabel,
       "Username field is required"
     );
     await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
       page,
-      registerPageAccountDetails.email,
+      registerPageAccountDetails.emailLabel,
       "Email",
-      registerPageAccountDetails.emailError,
+      registerPageAccountDetails.emailLabel,
       "Email field is required"
     );
     await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
       page,
-      registerPageAccountDetails.password,
+      registerPageAccountDetails.passwordLabel,
       "Password",
-      registerPageAccountDetails.passError,
+      registerPageAccountDetails.passwordLabel,
       "Password field is required"
     );
     await registerPageAccountDetails.checkInputHeaderAndErrorInfo(
       page,
-      registerPageAccountDetails.confirmPassword,
+      registerPageAccountDetails.confirmPasswordLabel,
       "Confirm password",
-      registerPageAccountDetails.confirmPassError,
+      registerPageAccountDetails.confirmPasswordLabel,
       "Confirm password field is required"
     );
   });
@@ -109,6 +113,143 @@ test.describe("Register", () => {
       password
     );
     await registerPageBottomContent.agreeConditionsAndRegister(true, true);
+  });
+
+  test("Register - Account Details Provide Incorrect Username", async () => {
+    const password = generateValidPassword();
+
+    await registerPageAccountDetails.provideAccountDetailsInRegisterForm(
+      "",
+      faker.internet.email(),
+      password,
+      password
+    );
+
+    await expect(registerPageAccountDetails.usernameLabel).toHaveText(
+      "Username field is required"
+    );
+
+    const usernameSteps = [
+      {
+        valueToInput: faker.internet.username().slice(1, 4),
+        expectedLabelText: "Use 5 character or longer",
+      },
+      {
+        valueToInput: "Long123456789012",
+        expectedLabelText: "Use maximum 15 character",
+      },
+    ];
+
+    await checkValidation(
+      registerPageAccountDetails.usernameInput,
+      registerPageAccountDetails.usernameLabel,
+      usernameSteps
+    );
+  });
+
+  test("Register - Account Details Provide Incorrect Email", async () => {
+    const password = generateValidPassword();
+
+    await registerPageAccountDetails.provideAccountDetailsInRegisterForm(
+      faker.internet.username().slice(1, 15),
+      "",
+      password,
+      password
+    );
+    await expect(registerPageAccountDetails.emailLabel).toHaveText(
+      "Email field is required"
+    );
+
+    const emailSteps = [
+      {
+        valueToInput: "test",
+        expectedLabelText: "Your email address isn't formatted correctly",
+      },
+      {
+        valueToInput: "test@",
+        expectedLabelText: "Your email address isn't formatted correctly",
+      },
+      {
+        valueToInput: "test@o",
+        expectedLabelText: "Your email address isn't formatted correctly",
+      },
+      {
+        valueToInput: "test@op",
+        expectedLabelText: "Your email address isn't formatted correctly",
+      },
+      {
+        valueToInput: "test@op.",
+        expectedLabelText: "Your email address isn't formatted correctly",
+      },
+      {
+        valueToInput: "test@op.p",
+        expectedLabelText: "Your email address isn't formatted correctly",
+      },
+      { valueToInput: "test@op.pl", expectedLabelText: "Email" },
+    ];
+
+    await checkValidation(
+      registerPageAccountDetails.emailInput,
+      registerPageAccountDetails.emailLabel,
+      emailSteps
+    );
+  });
+
+  // Analogicznie dla hasła i potwierdzenia hasła:
+
+  test("Register - Account Details Provide Incorrect Password", async () => {
+    await registerPageAccountDetails.provideAccountDetailsInRegisterForm(
+      faker.internet.username().slice(1, 15),
+      faker.internet.email(),
+      "",
+      "Aaa1"
+    );
+
+    await expect(registerPageAccountDetails.passwordLabel).toHaveText(
+      "Password field is required"
+    );
+
+    const passwordSteps = [
+      { valueToInput: "Tes", expectedLabelText: "Use  4 character or longer" },
+      { valueToInput: "Test", expectedLabelText: "One number required" },
+      { valueToInput: "tes1", expectedLabelText: "One upper letter required" },
+      { valueToInput: "TEST", expectedLabelText: "One lower letter required" },
+      {
+        valueToInput: "Test123456789",
+        expectedLabelText: "Use maximum 12 character",
+      },
+      { valueToInput: "Tes1", expectedLabelText: "Password" },
+    ];
+
+    await checkValidation(
+      registerPageAccountDetails.passInput,
+      registerPageAccountDetails.passwordLabel,
+      passwordSteps
+    );
+  });
+
+  test("Register - Account Details Provide Incorrect Confirm Password", async () => {
+    await registerPageAccountDetails.provideAccountDetailsInRegisterForm(
+      faker.internet.username().slice(1, 15),
+      faker.internet.email(),
+      "Aaa1",
+      ""
+    );
+    await registerPageAccountDetails.confirmPassInput.blur();
+    await expect(registerPageAccountDetails.confirmPasswordLabel).toHaveText(
+      "Confirm password field is required"
+    );
+
+    const confirmSteps = [
+      { valueToInput: "Aaa2", expectedLabelText: "Passwords do not match" },
+      { valueToInput: "Aaa1", expectedLabelText: "Confirm password" },
+    ];
+
+    await checkValidation(
+      registerPageAccountDetails.confirmPassInput,
+      registerPageAccountDetails.confirmPasswordLabel,
+      confirmSteps
+    );
   });
 
   test("Register - Provide All Correct Informations", async ({ page }) => {
